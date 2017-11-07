@@ -3,16 +3,36 @@ import requests
 import sys
 import getopt
 import datetime as dt
-
+import re
 # Run script with command line argument being spin or beach
 
 # date: 2017-11-1, start_time: 22:00:00, end_time: 23:00:00, num = 1,2,3,4 which is Las Palmas <num>
 #Example of formatting of booking address, divided in two rows :
 	#https://bokning.iksu.se/index.php?func=do_cal_reservation&location=100&cdate=2017-11-08
 	#&res_stime=2017-11-08 07:00:00&res_etime=2017-11-08 08:00:00&objectCode=XBE1&pageId=275&RSVID=0&DETID=0
+	#Could have input be start hour: start=20, then in the function have end = start+1 
+	# after that: start_time=str(start)+":00:00"
+	#		      end_time=str(end)+":00:00"
 def getBeachUrl(date,start_time,end_time,num):
 	url_book_temp = 'https://bokning.iksu.se/index.php?func=do_cal_reservation&location=100&cdate=' + date + '&res_stime='
 	return url_book_temp+date+' '+start_time+'&res_etime='+date+' '+end_time+'&objectCode=XBE'+str(num)+'&pageId=275&RSVID=0&DETID=0'
+
+# Goal of finding the ID of the class, can be done by entering an URL that has filters populated 
+# The returning html code contains a lot of information, at the end of the code one can find the classes that the search returned. 
+# Every class has a unique "tr id" which is an 8 digit number
+def getClassID(session,fromDate,thruDate,fromTime,thruTime,daysOfWeek,locations,class_obj,instructors):
+	# payload = {'fromDate': '2015-09-11', 'thruDate': '2015-09-18', 'fromTime':'06:00', 'thruTime':'23:00', 'daysOfWeek[]':'2', 'locations[]':'100', 
+	#'obj_classes[g_iw]':'X', 'objects[]':'IW55', 'instructors[]':'CAHO', 'func':'fres', 'search':'T', 'btn_submit':'x'}
+	# Add dictionary for instructors and class_obj I like
+	tUrl = "/index.php?fromDate="+fromDate+"&thruDate="+thruDate+"&fromTime="+fromTime+"%3A00&thruTime="+ thruTime+"%3A00&daysOfWeek%5B%5D="+daysOfWeek
+	tUrl2 = "&obj_classes%5B"+class_obj+"%5D=X&instructors%5B%5D="+instructors+"&func=fres&search=T&btn_submit=x&xajaxreq=1"
+	url = "https://bokning.iksu.se"+tUrl+tUrl2
+	p = session.get('https://bokning.iksu.se/index.php?func=fres'+tUrl+tUrl2)
+	tReturn = (p.text).encode('utf-8').split("tr id",1)[1] 
+	print tReturn
+	class_id = re.search(r'\d+\d+\d+\d+\d+\d+\d+\d+',tReturn)
+	print class_id.group()	
+	return p
 
 # Adds date and time to fname_
 def timeStamped(fname, fmt='{fname}_%Y-%m-%d_%H%M%S'):
@@ -108,8 +128,13 @@ def main(argv):
 					break;
 			if booked:
 				break;
-	elif 'spin' in str(argv):
+	elif 'spin' in str(argv[0]):
 		p = bookSpin(session)
+	else:
+		print "in else"
+		testing='1'
+				    #session,fromDate,thruDate,fromTime,thruTime,daysOfWeek,locations,class_obj,instructors
+		getClassID(session,'2017-11-07','2017-11-12','06','23','6','100','g_cy','ALTE')
 	#Write answer to output.txt
 	#with open(timeStamped('response')+'.txt','w') as out:
 	with open('response.txt','w') as out:
