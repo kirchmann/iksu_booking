@@ -130,7 +130,7 @@ def main(argv):
 		#p = bookSpin(session)
 		location = 'IKSU Sport'
 				#session,fromDate,thruDate,fromTime,thruTime,daysOfWeek,locations,class_obj,instructors
-		class_id,loc = sc.getClassID(session,str(date),bookDate,'09','12','Saturday',location,'g_cy','ALTE')
+		class_id,loc = sc.getClassID(session,bookDate,bookDate,'09','12','Saturday',location,'g_cy','ALTE')
 		bookClass(session,class_id,loc)
 	else:
 		print "Incorrect command line argument, only supports 'spin' and 'beach'."
