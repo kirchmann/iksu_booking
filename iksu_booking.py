@@ -111,8 +111,8 @@ def main(argv):
 	if 'beach' in str(argv[0]):
 		# To check available times:
 		#url_beach = 'https://bokning.iksu.se/index.php?func=mod_rc_v2&tac=&pageId=275&cdate=' + bookDate
-		booktime_s = ["21:00:00","20:00:00"]
-		booktime_e = ["22:00:00","21:00:00"]
+		booktime_s = ["20:00:00","21:00:00"]
+		booktime_e = ["21:00:00","22:00:00"]
 		lasPalmasnum = [1,2,3,4]
 		booked = False
 		for i in xrange(0,len(booktime_s)):
