@@ -19,7 +19,8 @@ def getClassID(session,fromDate,thruDate,fromTime,thruTime,weekday,location,clas
 	print url
 	print 'https://bokning.iksu.se'+tUrl+tUrl2
 	p = session.get('https://bokning.iksu.se/index.php?func=fres'+tUrl+tUrl2)
-	tReturn = (p.text).encode('utf-8').split("tr id",1)[1] 
+	extracttemp = (p.text).encode('utf-8').split("Lördag "+thruDate,1)[1] 
+	tReturn = extracttemp.split("tr id",1)[1] 
 	print tReturn
 	class_id = re.search(r'\d+\d+\d+\d+\d+\d+\d+\d+',tReturn)	
 	return class_id.group(),locationDict[location]
