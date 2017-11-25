@@ -22,8 +22,12 @@ def bookClass(session,class_id,location):
 	print "Attempting to book spin class using url: "
 	print url
 	p = session.get(url)
-	if "Du har nu bokat följande" and "Cykel 55" in str(p.text.encode('utf-8')):
-		print "Booking of Cykel 55 Watt Successfull"
+	tResponse = str(p.text.encode('utf-8'))
+	temp = tResponse.split("Bokningar",1)[1] 
+	print temp
+
+	if class_id in tResponse:
+		print "Booking of Cykel 55 Watt successfull"
 	else:
 		print "Failed to book Cykel 55 Watt"
 	return p
@@ -98,6 +102,7 @@ def main(argv):
 
 	login_filename = str(argv[1])
 	date = dt.date.today()
+	tomorrow = str(date+dt.timedelta(days=1))
 	bookDate = str(date + dt.timedelta(days=7))
 	orig_sys = sys.stdout
 	user,passw = readUserData(login_filename)
@@ -111,8 +116,8 @@ def main(argv):
 	if 'beach' in str(argv[0]):
 		# To check available times:
 		#url_beach = 'https://bokning.iksu.se/index.php?func=mod_rc_v2&tac=&pageId=275&cdate=' + bookDate
-		booktime_s = ["20:00:00","21:00:00"]
-		booktime_e = ["21:00:00","22:00:00"]
+		booktime_s = ["20:00:00","21:00:00","15:00:00"]
+		booktime_e = ["21:00:00","22:00:00","16:00:00"]
 		lasPalmasnum = [1,2,3,4]
 		booked = False
 		for i in xrange(0,len(booktime_s)):
@@ -130,7 +135,7 @@ def main(argv):
 		#p = bookSpin(session)
 		location = 'IKSU Sport'
 				#session,fromDate,thruDate,fromTime,thruTime,daysOfWeek,locations,class_obj,instructors
-		class_id,loc = sc.getClassID(session,bookDate,bookDate,'09','12','Saturday',location,'g_cy','ALTE')
+		class_id,loc = sc.getClassID(session,tomorrow,bookDate,'09','12','Saturday',location,'g_cy','ALTE')
 		bookClass(session,class_id,loc)
 	else:
 		print "Incorrect command line argument, only supports 'spin' and 'beach'."
